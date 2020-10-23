@@ -1,9 +1,7 @@
 from typing import *
-from planilha import Planilha
-from info_adicional import InformacaoAdicionalASerObtida
-from pessoa import Pessoa
-
-import enviador
+from backend.planilha import Planilha
+from backend.info_adicional import InformacaoAdicionalASerObtida
+from backend.pessoa import Pessoa
 
 nome_planilha: str = 'Teste bot'
 numero_sheet: int = 0
@@ -27,5 +25,3 @@ planilha: Planilha = Planilha(nome_planilha, numero_sheet, linha_inicial, linha_
                               infos_adicionais, funcao_deve_enviar)
 
 mensagens: List[str] = ['Essa é uma mensagem de teste', 'C:\\Users\\rafae\\Pictures\\stickbug.jpg', '%CaminhoArquivo']
-
-enviador.enviar_mensagens_com_informacoes_planilha(planilha, mensagens, nome_arquivo_resultado)

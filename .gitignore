@@ -1,4 +1,5 @@
 /.idea/
+/venv/
 resultados/
 credenciais.json
 debug.log

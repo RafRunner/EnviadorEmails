@@ -1,5 +1,5 @@
 from typing import *
-from info_adicional import InformacaoAdicionalEspecifica
+from backend.info_adicional import InformacaoAdicionalEspecifica
 
 
 class Pessoa(object):

@@ -1,5 +1,5 @@
 from typing import *
-from pessoa import Pessoa
+from backend.pessoa import Pessoa
 
 import re
 

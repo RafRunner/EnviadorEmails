@@ -1,6 +1,6 @@
 from typing import *
 
-import planilha
+from backend import planilha
 
 
 class InformacaoAdicionalASerObtida(object):

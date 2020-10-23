@@ -1,11 +1,11 @@
 from typing import *
 from oauth2client.service_account import ServiceAccountCredentials
-from pessoa import Pessoa
-from info_adicional import InformacaoAdicionalEspecifica
-from info_adicional import InformacaoAdicionalASerObtida
+from backend.pessoa import Pessoa
+from backend.info_adicional import InformacaoAdicionalEspecifica
+from backend.info_adicional import InformacaoAdicionalASerObtida
 
 import gspread
-import formatador
+from backend import formatador
 
 
 def trata_coluna(nome_coluna: str) -> int:
