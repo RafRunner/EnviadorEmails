@@ -4,37 +4,19 @@ from backend.pessoa import Pessoa
 import re
 
 
-class NumeroInvalido(Exception):
-    pass
+email_regex = re.compile("""(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])""")
 
 
-def formatar_numero_goiania_brasil(numero: str) -> str:
-    numero_formatado: str = re.subn(r'[- ()+]', '', numero)[0]
+def email_eh_invalido(email: str) -> bool:
+    return email_regex.fullmatch(email) is None
 
-    if numero_formatado == '':
-        raise NumeroInvalido()
 
-    numero_formatado = re.search(r'\d+', numero_formatado).group()
+def formata_nome(nome: str) -> str:
+    return nome.lower().strip().title()
 
-    if len(numero_formatado) < 8:
-        raise NumeroInvalido()
 
-    if len(numero_formatado) == 13:
-        return numero_formatado
-
-    if len(numero_formatado) > 8 and numero_formatado[-9] != '9':
-        numero_formatado = numero_formatado[0:-8] + '9' + numero_formatado[-8:]
-
-    elif len(numero_formatado) == 8:
-        numero_formatado = '9' + numero_formatado
-
-    if len(numero_formatado) == 9:
-        numero_formatado = '5562' + numero_formatado
-
-    elif len(numero_formatado) == 11:
-        numero_formatado = '55' + numero_formatado
-
-    return numero_formatado
+def formata_email(email: str) -> str:
+    return email.strip()
 
 
 def parse_verdadeiro_falso(valor: Any) -> bool:
