@@ -34,17 +34,19 @@ def parse_verdadeiro_falso(valor: Any) -> bool:
     return bool(valor_tratado)
 
 
-def formatar_mensagens(mensagens: List[str], pessoa: Pessoa) -> List[str]:
-    mensagens_formatadas: List[str] = []
+def formatar_partes_em_email(email_origem:str, partes: List[str], pessoa: Pessoa) -> str:
+    partes_formatadas: List[str] = []
 
-    for mensagem in mensagens:
-        mensagem_formatada = mensagem.replace('%nome', pessoa.nome)
-        mensagem_formatada = mensagem_formatada.replace('%primeiro_nome', pessoa.primeiro_nome)
+    for parte in partes:
+        parte_formatada = parte.replace('%nome', pessoa.nome)
+        parte_formatada = parte_formatada.replace('%primeiro_nome', pessoa.primeiro_nome)
 
         if pessoa.infos_adicionais is not None:
             for info in pessoa.infos_adicionais:
-                mensagem_formatada = mensagem.replace('%' + info.nome_info, info.get_substituicao(pessoa))
+                parte_formatada = parte.replace('%' + info.nome_info, info.get_substituicao(pessoa))
 
-        mensagens_formatadas.append(mensagem_formatada)
+        partes_formatadas.append(parte_formatada)
 
-    return mensagens_formatadas
+    email_formatado: str = 'From: {}\r\nTo: {}\r\nSubject: {}\r\n{}'.format(email_origem, pessoa.email, partes_formatadas[0], '\n'.join(partes_formatadas[1:]))
+
+    return email_formatado

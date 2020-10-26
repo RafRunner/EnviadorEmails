@@ -22,5 +22,5 @@ class Pessoa(object):
         return None
 
     def __str__(self):
-        return 'Linha:' + str(self.linha) + '\nNome: ' + self.nome + '\nEmail: ' + self.email + '\nDeve enviar: ' + \
+        return 'Linha: ' + str(self.linha) + '\nNome: ' + self.nome + '\nEmail: ' + self.email + '\nDeve enviar: ' + \
                str(self.deve_enviar) + '\nInvalido: ' + str(self.invalido) + '\n'
