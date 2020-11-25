@@ -34,18 +34,19 @@ def parse_verdadeiro_falso(valor: Any) -> bool:
     return bool(valor_tratado)
 
 
+def personalisa(string: str, pessoa: Pessoa):
+    string_formatada = string.replace('%nome', pessoa.nome)
+    string_formatada = string_formatada.replace('%primeiro_nome', pessoa.primeiro_nome)
+
+    if pessoa.infos_adicionais is not None:
+        for info in pessoa.infos_adicionais:
+            string_formatada = string_formatada.replace('%' + info.nome_info, info.get_substituicao(pessoa))
+
+    return string_formatada
+
+
 # Retorna uma lista onde a primeira posição é o assunto formatado e a segunda é o corpo formatado
 def formatar_partes_email(partes: List[str], pessoa: Pessoa) -> List[str]:
-    partes_formatadas: List[str] = []
-
-    for parte in partes:
-        parte_formatada = parte.replace('%nome', pessoa.nome)
-        parte_formatada = parte_formatada.replace('%primeiro_nome', pessoa.primeiro_nome)
-
-        if pessoa.infos_adicionais is not None:
-            for info in pessoa.infos_adicionais:
-                parte_formatada = parte.replace('%' + info.nome_info, info.get_substituicao(pessoa))
-
-        partes_formatadas.append(parte_formatada)
+    partes_formatadas: List[str] = [personalisa(parte, pessoa) for parte in partes]
 
     return [partes_formatadas.pop(0), '\n'.join(partes_formatadas)]

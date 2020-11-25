@@ -1,5 +1,6 @@
 from typing import *
 from backend.formatador import formatar_partes_email
+from backend.formatador import personalisa
 from backend.pessoa import Pessoa
 from backend.planilha import Planilha
 from email.message import EmailMessage
@@ -7,9 +8,16 @@ from email.message import EmailMessage
 import smtplib
 import os
 import errno
+import imghdr
 
 
-def enviar_emails_com_informacoes_planilha(email_origim: str, senha_origem: str, planilha: Planilha, partes_email: List[str], nome_arquivo_resultado: str):
+def enviar_emails_com_informacoes_planilha(
+        email_origim: str,
+        senha_origem: str,
+        planilha: Planilha,
+        partes_email: List[str],
+        anexos: List[str],
+        nome_arquivo_resultado: str):
     pasta_resultados: str = 'resultados'
     arquivo_resultado = os.path.join(pasta_resultados, nome_arquivo_resultado)
 
@@ -29,7 +37,6 @@ def enviar_emails_com_informacoes_planilha(email_origim: str, senha_origem: str,
             '\n\n///////////////////////////////////////////Inicio de uma nova execução de envio!!//////////////////////////////////////////////////////\n\n')
 
         resultado.write(f'Email de origem das mensagens: {email_origim}\n\n')
-
         resultado.write('Composição do email:\n')
 
         for parte in partes_email:
@@ -41,39 +48,65 @@ def enviar_emails_com_informacoes_planilha(email_origim: str, senha_origem: str,
 
         for pessoa in pessoas:
             if pessoa.invalido:
-                resultado.write(str(pessoa))
-                resultado.write('FALHA! Email não enviado para a pessoa acima por ela estar com o endereço de email inválido\n\n')
+                registra_resultado_pessoa(pessoa, 'FALHA! Email não enviado para a pessoa acima por ela estar com o endereço de email inválido', resultado)
                 continue
 
             if not pessoa.deve_enviar:
-                resultado.write(str(pessoa))
-                resultado.write('Email não enviado para a pessoa acima pois não era necessário\n\n')
+                registra_resultado_pessoa(pessoa, 'Email não enviado para a pessoa acima pois não era necessário', resultado)
                 continue
 
             # Enviando o email de fato
             try:
-                partes_formatadas: List[str] = formatar_partes_email(partes_email, pessoa)
-
-                msg: EmailMessage = EmailMessage()
-                msg['Subject'] = partes_formatadas[0]
-                msg['From'] = email_origim
-                msg['To'] = pessoa.email
-                msg.set_content(partes_formatadas[1])
-
-                smtp.send_message(msg)
+                smtp.send_message(monta_mensagem_email(email_origim, pessoa, partes_email, anexos, resultado))
 
                 planilha.marca_como_enviado(pessoa)
-                resultado.write(str(pessoa))
-                resultado.write('SUCESSO! Email enviado para a pessoa acima com sucesso\n\n')
+                registra_resultado_pessoa(pessoa, 'SUCESSO! Email enviado para a pessoa acima com sucesso', resultado)
 
             except Exception as e:
-                print(str(pessoa))
-                print(e)
-                resultado.write(str(pessoa))
-                resultado.write(f"Ocorreu um erro ao enviar o email para a pessoa acima: {e}\n\n")
+                registra_resultado_pessoa(pessoa, f'Ocorreu um erro ao enviar o email para a pessoa acima: {e}', resultado)
 
     except Exception as err:
         resultado.write('\nERRO CRÍTICO! A execução teve que ser interrompida por uma exception: ' + str(err) + '\n\n')
     finally:
         resultado.close()
         smtp.close()
+
+
+def registra_resultado_pessoa(pessoa: Pessoa, mensgem: str, resultado):
+    resultado.write(str(pessoa) + '\n')
+    resultado.write(mensgem + '\n\n')
+
+
+def monta_mensagem_email(email_origim: str, pessoa: Pessoa, partes_email: List[str], anexos: List[str], resultado) -> EmailMessage:
+    msg: EmailMessage = EmailMessage()
+    partes_formatadas: List[str] = formatar_partes_email(partes_email, pessoa)
+
+    msg['Subject'] = partes_formatadas[0]
+    msg['From'] = email_origim
+    msg['To'] = pessoa.email
+    msg.set_content(partes_formatadas[1])
+
+    for arquivo in anexos:
+        arquivo = personalisa(arquivo, pessoa)
+
+        if os.path.exists(arquivo):
+            with open(arquivo, 'rb') as f:
+                file_data = f.read()
+                file_name = os.path.basename(f.name)
+                file_type: str
+                subtype: str
+
+                image_type: str = imghdr.what(arquivo)
+
+                if image_type:
+                    file_type = 'image'
+                    subtype = image_type
+                else:
+                    file_type = 'application'
+                    subtype = 'octet-stream'
+
+                msg.add_attachment(file_data, maintype=file_type, subtype=subtype, filename=file_name)
+        else:
+            resultado.write(f"Arquivo {arquivo} não anexado pois não existe\n")
+
+    return msg

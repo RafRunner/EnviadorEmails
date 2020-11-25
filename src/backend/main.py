@@ -27,10 +27,12 @@ def funcao_deve_enviar(_: Pessoa) -> bool:
 
 nome_arquivo_resultado: str = 'teste bot'
 
-partes_email: List[str] = ['Agora seu nome está aqui: %primeiro_nome', 'Se o seu primeiro nome, %nome, apareceu no assunto é porque deu bom\n',
-                           'Atenciosamente (espero que mais),\n', 'Rafael Nunes Santana']
+partes_email: List[str] = ['Estou testando o envio de anexos 2, %primeiro_nome', 'Por favor tentar baixar e ver se deu certo\n',
+                           'Atenciosamente\n', 'Rafael Nunes Santana']
+
+anexos: List[str] = ['/home/rafaelsantana/Downloads/LR corrigido.pdf', '/home/rafaelsantana/Pictures/Nasa 1.jpeg']
 
 planilha: Planilha = Planilha(nome_planilha, numero_sheet, linha_inicial, linha_final, coluna_nome, coluna_email, coluna_check,
                               infos_adicionais, funcao_deve_enviar)
 
-enviar_emails_com_informacoes_planilha(email_origem, senha_origem, planilha, partes_email, nome_arquivo_resultado)
+enviar_emails_com_informacoes_planilha(email_origem, senha_origem, planilha, partes_email, anexos, nome_arquivo_resultado)
