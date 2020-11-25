@@ -1,7 +1,8 @@
 from typing import *
-from backend.formatador import formatar_partes_em_email
+from backend.formatador import formatar_partes_email
 from backend.pessoa import Pessoa
 from backend.planilha import Planilha
+from email.message import EmailMessage
 
 import smtplib
 import os
@@ -49,9 +50,18 @@ def enviar_emails_com_informacoes_planilha(email_origim: str, senha_origem: str,
                 resultado.write('Email não enviado para a pessoa acima pois não era necessário\n\n')
                 continue
 
+            # Enviando o email de fato
             try:
-                email_formatado: str = formatar_partes_em_email(email_origim, partes_email, pessoa)
-                smtp.sendmail(email_origim, pessoa.email, email_formatado.encode('utf-8'))
+                partes_formatadas: List[str] = formatar_partes_email(partes_email, pessoa)
+
+                msg: EmailMessage = EmailMessage()
+                msg['Subject'] = partes_formatadas[0]
+                msg['From'] = email_origim
+                msg['To'] = pessoa.email
+                msg.set_content(partes_formatadas[1])
+
+                smtp.send_message(msg)
+
                 planilha.marca_como_enviado(pessoa)
                 resultado.write(str(pessoa))
                 resultado.write('SUCESSO! Email enviado para a pessoa acima com sucesso\n\n')
@@ -60,10 +70,10 @@ def enviar_emails_com_informacoes_planilha(email_origim: str, senha_origem: str,
                 print(str(pessoa))
                 print(e)
                 resultado.write(str(pessoa))
-                resultado.write(f"Ocorreu um erro ao enviar o email para a pessoa acima:\n{e}\n\n")
+                resultado.write(f"Ocorreu um erro ao enviar o email para a pessoa acima: {e}\n\n")
 
     except Exception as err:
-        resultado.write('\nERRO CRÍTICO! A execução teve que ser interrompida por uma exception:' + str(err))
+        resultado.write('\nERRO CRÍTICO! A execução teve que ser interrompida por uma exception: ' + str(err) + '\n\n')
     finally:
         resultado.close()
         smtp.close()

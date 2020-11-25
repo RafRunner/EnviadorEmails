@@ -71,7 +71,8 @@ class Planilha(object):
         for i in range(0, len(nomes)):
             infos_adicionais_especificas: List[InformacaoAdicionalEspecifica] = self.__get_informacoes_adicionais_especificas(i)
 
-            deve_enviar: bool = not invalidos[i] and not enviados_booleanos[i]
+            #deve_enviar: bool = not invalidos[i] and not enviados_booleanos[i]
+            deve_enviar = True
 
             pessoa: Pessoa = Pessoa(self.linha_inicial + i + 1, nomes[i], emails[i], deve_enviar, invalidos[i], infos_adicionais_especificas)
 

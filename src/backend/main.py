@@ -28,7 +28,7 @@ def funcao_deve_enviar(_: Pessoa) -> bool:
 nome_arquivo_resultado: str = 'teste bot'
 
 partes_email: List[str] = ['Agora seu nome está aqui: %primeiro_nome', 'Se o seu primeiro nome, %nome, apareceu no assunto é porque deu bom\n',
-                           'Atensionamente (espero que mais),\n', 'Rafael Nunes Santana']
+                           'Atenciosamente (espero que mais),\n', 'Rafael Nunes Santana']
 
 planilha: Planilha = Planilha(nome_planilha, numero_sheet, linha_inicial, linha_final, coluna_nome, coluna_email, coluna_check,
                               infos_adicionais, funcao_deve_enviar)
