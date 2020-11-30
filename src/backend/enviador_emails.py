@@ -15,9 +15,11 @@ def enviar_emails_com_informacoes_planilha(
         email_origim: str,
         senha_origem: str,
         planilha: Planilha,
+        mensagem_html: Optional[str],
         partes_email: List[str],
         anexos: List[str],
-        nome_arquivo_resultado: str):
+        nome_arquivo_resultado: str) -> None:
+
     pasta_resultados: str = 'resultados'
     arquivo_resultado = os.path.join(pasta_resultados, nome_arquivo_resultado)
 
@@ -57,7 +59,7 @@ def enviar_emails_com_informacoes_planilha(
 
             # Enviando o email de fato
             try:
-                smtp.send_message(monta_mensagem_email(email_origim, pessoa, partes_email, anexos, resultado))
+                smtp.send_message(monta_mensagem_email(email_origim, pessoa, mensagem_html, partes_email, anexos, resultado))
 
                 planilha.marca_como_enviado(pessoa)
                 registra_resultado_pessoa(pessoa, 'SUCESSO! Email enviado para a pessoa acima com sucesso', resultado)
@@ -77,7 +79,14 @@ def registra_resultado_pessoa(pessoa: Pessoa, mensgem: str, resultado):
     resultado.write(mensgem + '\n\n')
 
 
-def monta_mensagem_email(email_origim: str, pessoa: Pessoa, partes_email: List[str], anexos: List[str], resultado) -> EmailMessage:
+def monta_mensagem_email(
+        email_origim: str,
+        pessoa: Pessoa,
+        mensagem_html: Optional[str],
+        partes_email: List[str],
+        anexos: List[str],
+        resultado) -> EmailMessage:
+
     msg: EmailMessage = EmailMessage()
     partes_formatadas: List[str] = formatar_partes_email(partes_email, pessoa)
 
@@ -85,6 +94,10 @@ def monta_mensagem_email(email_origim: str, pessoa: Pessoa, partes_email: List[s
     msg['From'] = email_origim
     msg['To'] = pessoa.email
     msg.set_content(partes_formatadas[1])
+
+    if mensagem_html:
+        html_formatado: str = personalisa(mensagem_html, pessoa)
+        msg.add_alternative(html_formatado, subtype='html')
 
     for arquivo in anexos:
         arquivo = personalisa(arquivo, pessoa)
@@ -98,7 +111,7 @@ def monta_mensagem_email(email_origim: str, pessoa: Pessoa, partes_email: List[s
 
                 image_type: str = imghdr.what(arquivo)
 
-                if image_type:
+                if image_type is not None:
                     file_type = 'image'
                     subtype = image_type
                 else:
