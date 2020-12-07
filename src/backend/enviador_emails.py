@@ -95,7 +95,7 @@ def monta_mensagem_email(
     msg['To'] = pessoa.email
     msg.set_content(partes_formatadas[1])
 
-    if mensagem_html:
+    if mensagem_html is not None:
         html_formatado: str = personalisa(mensagem_html, pessoa)
         msg.add_alternative(html_formatado, subtype='html')
 

@@ -1,5 +1,6 @@
 /.idea/
 /venv/
 resultados/
+__pycache__/
 credenciais.json
 debug.log
