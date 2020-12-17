@@ -3,6 +3,7 @@ from backend.planilha import Planilha
 from backend.info_adicional import InformacaoAdicionalASerObtida
 from backend.pessoa import Pessoa
 from backend.enviador_emails import enviar_emails_com_informacoes_planilha
+from formatador import parse_verdadeiro_falso
 
 import os
 
@@ -15,21 +16,23 @@ linha_inicial: int = 3
 linha_final: int = 5
 coluna_nome: str = 'B'
 coluna_email: str = 'C'
-coluna_check: str = 'E'
+coluna_check: str = 'F'
 
 infos_adicionais: List[InformacaoAdicionalASerObtida] = \
-    [InformacaoAdicionalASerObtida('D', 'gasto', lambda info, pessoa: f"R${info.valor},00")]
+    [InformacaoAdicionalASerObtida('D', 'gasto', lambda info, pessoa: f"R${info.valor},00"),
+     InformacaoAdicionalASerObtida('E', 'ja_pagou', lambda _, __: "")]
 
 
-def funcao_deve_enviar(_: Pessoa) -> bool:
-    return True
+def funcao_deve_enviar(pessoa: Pessoa) -> bool:
+    return not parse_verdadeiro_falso(pessoa.get_informacao_adicional('ja_pagou').valor)
 
 
-nome_arquivo_resultado: str = 'teste bot'
+nome_arquivo_resultado: str = 'capturando informações extras'
 
 mensagem_html: Optional[str] = None
 
-partes_email: List[str] = ['Estou testando a captura de informações personalizadas, %primeiro_nome', 'Seu gasto foi: %gasto',
+partes_email: List[str] = ['Boa noite! Estou fazendo a cobrança de uns produtos, %primeiro_nome', 'Seu gasto na nossa loja foi: %gasto',
+                           '\nPor favor, tente pagar até a próxima quinta %nome\n Estamos enviado os boletos em anexo',
                            '\nAtenciosamente,', 'Rafael Nunes Santana']
 
 anexos: List[str] = ['/home/rafaelsantana/Downloads/LR corrigido.pdf', '/home/rafaelsantana/Pictures/wallpapers/midnight forest.jpg']
